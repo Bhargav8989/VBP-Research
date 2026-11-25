@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VBP Research — What It Is, How to Use &amp; What You Get</title>
+  <link rel="icon" type="image/png" href="/static/vbp-logo.png" />
+  <link rel="apple-touch-icon" href="/static/vbp-logo.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="min-h-screen antialiased bg-slate-100 text-slate-900 flex flex-col">
+  <!-- Sticky Header -->
+  <header class="border-b border-slate-200 bg-white sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+      <a href="/" class="flex items-center gap-2.5 shrink-0">
+        <img src="/static/vbp-logo.png" alt="VBP Research" class="h-8 w-8 object-contain rounded bg-white p-0.5 border border-slate-200 shrink-0" />
+        <div>
+          <span class="text-sm sm:text-base font-bold tracking-tight text-slate-900 leading-tight block">
+            VBP Research
+          </span>
+          <span class="text-[11px] text-slate-500 leading-none hidden sm:block">
+            Indian Equity &amp; IPO Analyzer
+          </span>
+        </div>
+      </a>
+
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
+        <a
+          href="/app"
+          class="px-3 py-1.5 rounded-md text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition whitespace-nowrap"
+        >
+          Open Analyzer →
+        </a>
+        <a
+          href="https://www.vbpventures.co.in/contact"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-3 py-1.5 rounded-md text-xs font-semibold bg-sky-600 hover:bg-sky-700 text-white transition whitespace-nowrap"
+        >
+          Contact Us
+        </a>
+        <button
+          id="themeToggleBtn"
+          type="button"
+          title="Switch between Light and Dark theme"
+          class="px-2.5 py-1.5 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition"
+        >
+          🌙 Dark
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 py-8 sm:py-12 space-y-10">
+    <!-- Hero: What is this? -->
+    <section class="card-box rounded-xl p-6 sm:p-10 shadow-sm">
+      <div class="max-w-3xl space-y-4">
+        <div class="inline-flex items-center gap-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+          Free · Open Access · No Login Required
+        </div>
+        <h1 class="text-2xl sm:text-4xl font-extrabold tracking-tight text-slate-900 leading-tight">
+          Study how Indian stocks react around Results, AGMs &amp; IPOs — in seconds.
+        </h1>
+        <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+          <strong>VBP Research</strong> is a free, public equity &amp; IPO research tool for NSE/BSE stocks.
+          Instead of guessing how a stock behaves before or after quarterly results, or manually digging through IPO data,
+          you get instant historical event-study metrics, NIFTY 50 benchmark comparisons, and IPO fundamental &amp; peer checks in one place.
+        </p>
+        <div class="pt-2 flex flex-wrap items-center gap-3">
+          <a
+            href="/app"
+            class="px-5 py-2.5 rounded-lg text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition"
+          >
+            Launch Analyzer →
+          </a>
+          <a
+            href="#how-to-use"
+            class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition"
+          >
+            See How It Works
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- How to Use -->
+    <section id="how-to-use" class="space-y-4">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+          How to Use
+        </h2>
+        <p class="text-sm text-slate-600">
+          Get started in 3 simple steps — works for both listed NSE stocks and SME / Mainboard IPOs.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="card-box rounded-xl p-5 space-y-2">
+          <div class="inline-flex items-center justify-center h-7 w-7 rounded-md bg-sky-600 text-white text-xs font-bold">
+            1
+          </div>
+          <h3 class="text-base font-bold text-slate-900">
+            Choose Your Mode
+          </h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Open the <a href="/app" class="text-sky-600 font-semibold hover:underline">Analyzer</a> and pick
+            <strong>Results &amp; AGM</strong> for listed NSE stocks, or <strong>IPO Report (SME &amp; Regular)</strong> for upcoming and recently listed IPOs.
+          </p>
+        </div>
+
+        <div class="card-box rounded-xl p-5 space-y-2">
+          <div class="inline-flex items-center justify-center h-7 w-7 rounded-md bg-sky-600 text-white text-xs font-bold">
+            2
+          </div>
+          <h3 class="text-base font-bold text-slate-900">
+            Search &amp; Set Window
+          </h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Search any NSE symbol (like <code class="text-xs px-1 py-0.5 rounded bg-slate-100">RELIANCE</code>, <code class="text-xs px-1 py-0.5 rounded bg-slate-100">TCS</code>, <code class="text-xs px-1 py-0.5 rounded bg-slate-100">HDFCBANK</code>), select <strong>RESULTS</strong>, <strong>AGM</strong>, or a <strong>CUSTOM</strong> date, and set your before/after trading-day window (e.g. <code class="text-xs px-1 py-0.5 rounded bg-slate-100">T-20</code> to <code class="text-xs px-1 py-0.5 rounded bg-slate-100">T+20</code>).
+          </p>
+        </div>
+
+        <div class="card-box rounded-xl p-5 space-y-2">
+          <div class="inline-flex items-center justify-center h-7 w-7 rounded-md bg-sky-600 text-white text-xs font-bold">
+            3
+          </div>
+          <h3 class="text-base font-bold text-slate-900">
+            Review Charts &amp; Export
+          </h3>
+          <p class="text-sm text-slate-600 leading-relaxed">
+            Inspect the average pre/post-event move, win rate, alpha vs. NIFTY 50, interactive price &amp; volume charts, or download the full breakdown as a <strong>CSV</strong>.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- What You Get -->
+    <section class="space-y-4">
+      <div>
+        <h2 class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">
+          What You Get
+        </h2>
+        <p class="text-sm text-slate-600">
+          Built to turn raw market &amp; filing data into clear, actionable research views.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Module 1 -->
+        <div class="card-box rounded-xl p-6 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+              Results &amp; AGM Event-Study Analyzer
+            </h3>
+            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              NSE Stocks
+            </span>
+          </div>
+          <ul class="text-sm text-slate-600 space-y-2 list-disc pl-5">
+            <li><strong>Pre-Event vs. Post-Event Returns:</strong> See how a stock typically moves leading up to and after Results or AGMs.</li>
+            <li><strong>Win Rate &amp; Benchmark Alpha:</strong> Compare stock performance directly against <strong>NIFTY 50</strong> over the exact same trading-day window.</li>
+            <li><strong>Interactive Charts:</strong> Overlay multiple past events side-by-side (normalized to T=0) along with volume activity.</li>
+            <li><strong>Custom Date Range &amp; CSV Export:</strong> Test any custom date and export clean event tables for your own spreadsheets.</li>
+          </ul>
+        </div>
+
+        <!-- Module 2 -->
+        <div class="card-box rounded-xl p-6 space-y-3">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-base sm:text-lg font-bold text-slate-900">
+              IPO Report (SME &amp; Regular)
+            </h3>
+            <span class="px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-50 text-sky-700 border border-sky-200">
+              Mainboard &amp; SME
+            </span>
+          </div>
+          <ul class="text-sm text-slate-600 space-y-2 list-disc pl-5">
+            <li><strong>Upcoming &amp; Listed IPOs:</strong> Browse active, upcoming, and recently listed SME &amp; Mainboard IPOs in one view.</li>
+            <li><strong>Fundamental &amp; Valuation Snapshot:</strong> Key financial ratios, issue size, price band, and listing/post-listing performance.</li>
+            <li><strong>Sector Peer Comparison:</strong> Compare the IPO against listed industry peers on valuation and fundamentals.</li>
+            <li><strong>Structured Risk &amp; Strength Highlights:</strong> Quick-read summary to support your own independent research.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Bottom CTA -->
+    <section class="card-box rounded-xl p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-bold text-slate-900">Ready to explore?</h2>
+        <p class="text-sm text-slate-600">
+          Jump straight into the analyzer — no account or setup needed.
+        </p>
+      </div>
+      <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+        <a
+          href="/app"
+          class="px-5 py-2.5 rounded-lg text-sm font-semibold bg-emerald-600 hover:bg-emerald-700 text-white transition"
+        >
+          Open Analyzer →
+        </a>
+        <a
+          href="https://www.vbpventures.co.in/contact"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-4 py-2.5 rounded-lg text-sm font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition"
+        >
+          Contact Us
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer & Disclaimer -->
+  <footer class="border-t border-slate-200 bg-white mt-auto">
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs text-slate-500">
+      <p>
+        <strong>Disclaimer:</strong> VBP Research is for educational and informational purposes only and is not SEBI-registered investment advice.
+      </p>
+      <p class="shrink-0">
+        Built by <a href="https://www.vbpventures.co.in/contact" target="_blank" rel="noopener noreferrer" class="text-sky-600 hover:underline font-medium">VBP Ventures</a>
+      </p>
+    </div>
+  </footer>
+
+  <script>
+    (() => {
+      const btn = document.getElementById("themeToggleBtn");
+      const getSavedTheme = () => localStorage.getItem("vbp_theme") || "light";
+      const applyTheme = (theme) => {
+        const isDark = theme === "dark";
+        document.documentElement.classList.toggle("dark", isDark);
+        document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+        if (btn) btn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
+        localStorage.setItem("vbp_theme", isDark ? "dark" : "light");
+      };
+      applyTheme(getSavedTheme());
+      if (btn) {
+        btn.addEventListener("click", () => {
+          applyTheme(getSavedTheme() === "dark" ? "light" : "dark");
+        });
+      }
+    })();
+  </script>
+</body>
+</html>

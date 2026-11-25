@@ -39,6 +39,11 @@ if STATIC_DIR.exists():
 
 
 @app.get("/", include_in_schema=False)
+def serve_intro() -> FileResponse:
+    return FileResponse(STATIC_DIR / "intro.html")
+
+
+@app.get("/app", include_in_schema=False)
 def serve_frontend() -> FileResponse:
     return FileResponse(STATIC_DIR / "index.html")
 
