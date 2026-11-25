@@ -1,13 +1,3 @@
----
-title: VBP Research
-emoji: 📈
-colorFrom: blue
-colorTo: indigo
-sdk: docker
-app_port: 7860
-pinned: false
----
-
 # VBP Research — Indian Stock & IPO Analyzer
 
 A lightweight web application for analyzing Indian stocks (NSE/BSE) around **Quarterly Results**, **AGM**, or **Custom Dates**, plus a **GMP-Free SME & Regular IPO Fundamental & Valuation Report**.
