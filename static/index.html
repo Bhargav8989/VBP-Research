@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VBP Research — Indian Stock &amp; IPO Analyzer</title>
+  <link rel="icon" type="image/png" href="/static/vbp-logo.png" />
+  <link rel="apple-touch-icon" href="/static/vbp-logo.png" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body class="min-h-screen antialiased bg-slate-100 text-slate-900">
+  <!-- Compact Full-Width Header with Tab Switcher -->
+  <header class="border-b border-slate-200 bg-white sticky top-0 z-30">
+    <div class="w-full px-2 py-1.5 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+        <div class="flex items-center gap-2 shrink-0">
+          <img src="/static/vbp-logo.png" alt="VBP Research" class="h-8 w-8 object-contain rounded bg-white p-0.5 border border-slate-200 shrink-0" />
+          <h1 class="text-sm sm:text-base font-bold tracking-tight text-slate-900 leading-tight whitespace-nowrap">
+            VBP Research
+          </h1>
+        </div>
+
+        <!-- Primary Navigation Tabs -->
+        <nav class="inline-flex bg-slate-100 p-0.5 rounded-md border border-slate-200 text-xs">
+          <button type="button" data-tab="events" class="main-tab-btn seg-btn active px-2.5 py-1 rounded font-semibold">
+            Results &amp; AGM
+          </button>
+          <button type="button" data-tab="ipo" class="main-tab-btn seg-btn px-2.5 py-1 rounded font-semibold text-slate-600 hover:text-slate-900">
+            IPO Report (SME &amp; Regular)
+          </button>
+        </nav>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+        <a
+          href="https://www.vbpventures.co.in/contact"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="px-2.5 py-1 rounded-md text-xs font-semibold bg-sky-600 hover:bg-sky-700 text-white transition whitespace-nowrap"
+        >
+          Contact Us
+        </a>
+        <button
+          id="themeToggleBtn"
+          type="button"
+          title="Switch between Light and Dark theme"
+          class="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition"
+        >
+          🌙 Dark
+        </button>
+        <div id="eventHeaderActions" class="flex items-center gap-1.5 shrink-0">
+          <button
+            id="exportCsvBtn"
+            disabled
+            class="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 disabled:opacity-40 disabled:cursor-not-allowed transition"
+          >
+            CSV
+          </button>
+          <button
+            id="refreshBtn"
+            title="Fetch fresh data from NSE & Yahoo Finance"
+            class="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition"
+          >
+            ↻ Refresh
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main id="tabEvents" class="w-full p-1 sm:p-1.5 space-y-1.5">
+    <!-- Compact Controls Panel (Streamlined: Stock, Event, Window, Events, Analyze) -->
+    <section class="card-box rounded-md p-2 space-y-1.5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-1.5 items-end">
+        <!-- Stock Search -->
+        <div class="sm:col-span-2 lg:col-span-4 relative">
+          <label for="stockSearch" class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+            NSE Stock (Symbol / Name)
+          </label>
+          <div class="relative">
+            <input
+              id="stockSearch"
+              type="text"
+              autocomplete="off"
+              placeholder="e.g. RELIANCE, TCS, HDFCBANK..."
+              value="RELIANCE"
+              class="w-full bg-white border border-slate-300 focus:border-sky-500 focus:ring-1 focus:ring-sky-500 rounded px-2 py-1.5 text-sm text-slate-900 placeholder-slate-400 outline-none"
+            />
+            <span id="selectedSymbolBadge" class="absolute right-1.5 top-1/2 -translate-y-1/2 text-[10px] font-bold px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">
+              RELIANCE
+            </span>
+          </div>
+          <div
+            id="searchDropdown"
+            class="hidden absolute left-0 right-0 mt-1 bg-white border border-slate-300 rounded shadow-lg max-h-64 overflow-y-auto z-40 divide-y divide-slate-100"
+          ></div>
+        </div>
+
+        <!-- Event Type -->
+        <div class="lg:col-span-3">
+          <label class="block text-[11px] font-semibold text-slate-600 mb-0.5">Event Type</label>
+          <div class="grid grid-cols-3 gap-0.5 bg-slate-100 p-0.5 rounded border border-slate-200">
+            <button type="button" data-event="RESULTS" class="event-type-btn seg-btn active py-1 text-xs font-medium rounded">
+              Results
+            </button>
+            <button type="button" data-event="AGM" class="event-type-btn seg-btn py-1 text-xs font-medium rounded text-slate-600 hover:text-slate-900">
+              AGM
+            </button>
+            <button type="button" data-event="CUSTOM" class="event-type-btn seg-btn py-1 text-xs font-medium rounded text-slate-600 hover:text-slate-900">
+              Custom
+            </button>
+          </div>
+        </div>
+
+        <!-- Before / After Window -->
+        <div class="lg:col-span-2 grid grid-cols-2 gap-1.5">
+          <div>
+            <label for="beforeDays" class="block text-[11px] font-semibold text-slate-600 mb-0.5">Before (T-)</label>
+            <input
+              id="beforeDays"
+              type="number"
+              min="1"
+              max="120"
+              value="20"
+              class="w-full bg-white border border-slate-300 focus:border-sky-500 rounded px-2 py-1.5 text-sm text-slate-900 outline-none"
+            />
+          </div>
+          <div>
+            <label for="afterDays" class="block text-[11px] font-semibold text-slate-600 mb-0.5">After (T+)</label>
+            <input
+              id="afterDays"
+              type="number"
+              min="1"
+              max="120"
+              value="10"
+              class="w-full bg-white border border-slate-300 focus:border-sky-500 rounded px-2 py-1.5 text-sm text-slate-900 outline-none"
+            />
+          </div>
+        </div>
+
+        <!-- Events Lookback -->
+        <div class="lg:col-span-1">
+          <label for="limitSelect" class="block text-[11px] font-semibold text-slate-600 mb-0.5">Events</label>
+          <select
+            id="limitSelect"
+            class="w-full bg-white border border-slate-300 rounded px-2 py-1.5 text-sm text-slate-900 outline-none"
+          >
+            <option value="4">4</option>
+            <option value="8" selected>8</option>
+            <option value="12">12</option>
+            <option value="20">20</option>
+          </select>
+        </div>
+
+        <!-- Analyze CTA -->
+        <div class="sm:col-span-2 lg:col-span-2">
+          <button
+            id="analyzeBtn"
+            class="w-full py-1.5 px-3 rounded bg-sky-600 hover:bg-sky-700 text-white font-semibold text-sm transition"
+          >
+            Analyze
+          </button>
+        </div>
+      </div>
+
+      <!-- Optional Custom Dates Row -->
+      <div id="customDatesRow" class="hidden pt-1">
+        <label for="customDatesInput" class="block text-[11px] font-semibold text-slate-600 mb-0.5">
+          Custom Dates (comma-separated <code class="text-sky-700">YYYY-MM-DD</code>)
+        </label>
+        <input
+          id="customDatesInput"
+          type="text"
+          placeholder="e.g. 2025-07-18, 2025-10-17, 2026-01-16"
+          class="w-full bg-white border border-slate-300 focus:border-sky-500 rounded px-2 py-1.5 text-sm text-slate-900 placeholder-slate-400 outline-none"
+        />
+      </div>
+    </section>
+
+    <!-- Status / Error Banner -->
+    <div id="statusBanner" class="hidden rounded px-2.5 py-1.5 text-xs sm:text-sm border"></div>
+
+    <!-- Loading Skeleton -->
+    <div id="loadingState" class="hidden card-box rounded-md p-5 text-center space-y-1.5">
+      <div class="w-6 h-6 border-2 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <p class="text-xs sm:text-sm text-slate-700 font-medium">Fetching NSE corporate events &amp; price traces...</p>
+    </div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer" class="hidden space-y-1.5">
+      <!-- Stock Header Strip -->
+      <div class="card-box rounded-md px-2 py-1.5 flex flex-wrap items-center justify-between gap-1.5">
+        <div class="min-w-0">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <h2 id="stockTitle" class="text-sm sm:text-base font-bold text-slate-900 truncate">—</h2>
+            <span id="stockTickerBadge" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-50 text-sky-700 border border-sky-200">—</span>
+          </div>
+          <p id="stockSubtitle" class="text-[11px] text-slate-500">—</p>
+        </div>
+        <div class="text-right shrink-0">
+          <div id="latestPrice" class="text-sm sm:text-base font-bold text-slate-900">—</div>
+          <div id="latestDate" class="text-[10px] text-slate-500">—</div>
+        </div>
+      </div>
+
+      <!-- Upcoming Future Result / AGM Banner -->
+      <div id="upcomingBanner" class="hidden rounded-md px-2.5 py-1.5 text-xs border flex flex-wrap items-center justify-between gap-2"></div>
+
+      <!-- Two-Column Dashboard Top: Left = Regular + F&O Recommendations | Right = KPIs + Range Guide -->
+      <section class="grid grid-cols-1 lg:grid-cols-12 gap-1.5 items-stretch">
+        <!-- Left Side: Regular + F&O stacked on same side -->
+        <div id="recommendationsSection" class="hidden lg:col-span-6 flex flex-col gap-1.5">
+          <div id="recommendationsGrid" class="flex flex-col gap-1.5 flex-1"></div>
+          <p id="recommendationsDisclaimer" class="text-[10px] text-slate-500 px-0.5"></p>
+        </div>
+
+        <!-- Right Side: KPI Cards + Best Range Comparison stacked on other side -->
+        <div class="lg:col-span-6 flex flex-col gap-1.5">
+          <div id="kpiGrid" class="grid grid-cols-2 sm:grid-cols-3 gap-1.5"></div>
+
+          <!-- Best Range Comparison Helper -->
+          <div id="rangeComparisonBox" class="hidden card-box rounded-md overflow-hidden flex-1">
+            <div class="px-2 py-1 bg-slate-50 border-b border-slate-200 flex items-center justify-between gap-2">
+              <span class="text-[11px] font-bold text-slate-800">Range Guide (Click any range to apply)</span>
+              <span class="text-[10px] text-slate-500">Auto-compares windows</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-[11px]">
+                <thead>
+                  <tr class="bg-slate-50/70 text-slate-500 text-[10px] uppercase border-b border-slate-200">
+                    <th class="py-1 px-2">Range</th>
+                    <th class="py-1 px-1.5">Best For</th>
+                    <th class="py-1 px-1.5 text-right">Pre %</th>
+                    <th class="py-1 px-1.5 text-right">Post %</th>
+                    <th class="py-1 px-1.5 text-right">Total %</th>
+                    <th class="py-1 px-2 text-right">Win %</th>
+                  </tr>
+                </thead>
+                <tbody id="rangeComparisonBody" class="divide-y divide-slate-100"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Main Multi-Event Overlay Chart (with ₹ Price & R/A Icon) -->
+      <section class="card-box rounded-md p-1.5 sm:p-2 space-y-1">
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <div class="min-w-0">
+            <h3 class="text-xs sm:text-sm font-bold text-slate-900">Event Trace Overlay (% Return &amp; ₹ Price)</h3>
+            <p id="chartSubtitle" class="text-[11px] text-slate-500 truncate">
+              All past events aligned at T0 with Average Pattern &amp; ₹ Price
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 text-xs">
+            <label class="inline-flex items-center gap-1 cursor-pointer text-slate-700">
+              <input id="showPriceLine" type="checkbox" checked class="rounded border-slate-300 text-emerald-600" />
+              <span>₹ Price</span>
+            </label>
+            <label class="inline-flex items-center gap-1 cursor-pointer text-slate-700">
+              <input id="showIndividualLines" type="checkbox" checked class="rounded border-slate-300 text-sky-600" />
+              <span>All Events</span>
+            </label>
+            <label class="inline-flex items-center gap-1 cursor-pointer text-slate-700">
+              <input id="showMedianLine" type="checkbox" class="rounded border-slate-300 text-amber-500" />
+              <span>Median</span>
+            </label>
+          </div>
+        </div>
+        <div id="overlayChart" class="w-full h-[300px] sm:h-[370px]"></div>
+      </section>
+
+      <!-- Drill-Down Single Event Price + Volume Chart -->
+      <section id="drilldownSection" class="hidden card-box rounded-md p-1.5 sm:p-2 space-y-1">
+        <div class="flex items-center justify-between gap-1.5">
+          <div class="min-w-0">
+            <h3 id="drilldownTitle" class="text-xs sm:text-sm font-bold text-slate-900 truncate">Selected Event Price &amp; Volume</h3>
+            <p id="drilldownSubtitle" class="text-[11px] text-slate-500 truncate">Exact closing price (₹) and daily volume around T0</p>
+          </div>
+          <button
+            id="closeDrilldownBtn"
+            class="text-xs px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 shrink-0"
+          >
+            Hide
+          </button>
+        </div>
+        <div id="drilldownChart" class="w-full h-[230px] sm:h-[270px]"></div>
+      </section>
+
+      <!-- Event Breakdown Table -->
+      <section class="card-box rounded-md overflow-hidden">
+        <div class="px-2 py-1.5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-1.5 bg-slate-50">
+          <div>
+            <h3 class="text-xs sm:text-sm font-bold text-slate-900">Event-by-Event Breakdown</h3>
+            <p class="text-[10px] text-slate-500">Tap/click any row to plot its ₹ price &amp; highlight on chart</p>
+          </div>
+          <span id="eventCountBadge" class="text-[10px] font-medium px-2 py-0.5 rounded-full bg-white text-slate-700 border border-slate-300">0 events</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                <th class="py-1.5 px-2">T0 Date</th>
+                <th class="py-1.5 px-1.5">Event / Source</th>
+                <th class="py-1.5 px-1.5 text-right">Start ₹</th>
+                <th class="py-1.5 px-1.5 text-right">T0 ₹</th>
+                <th class="py-1.5 px-1.5 text-right">End ₹</th>
+                <th class="py-1.5 px-1.5 text-right">Pre %</th>
+                <th class="py-1.5 px-1.5 text-right">T0 %</th>
+                <th class="py-1.5 px-1.5 text-right">Post %</th>
+                <th class="py-1.5 px-1.5 text-right">Total %</th>
+                <th class="py-1.5 px-1.5 text-right">Alpha</th>
+                <th class="py-1.5 px-1.5 text-right">Max/DD</th>
+                <th class="py-1.5 px-2 text-right">Vol</th>
+              </tr>
+            </thead>
+            <tbody id="eventsTableBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Auto Sector / Peer Comparison (Max 5) -->
+      <section id="peerComparisonSection" class="hidden card-box rounded-md p-2 space-y-1.5">
+        <div class="text-center border-b border-slate-200 pb-1.5">
+          <h3 id="peerComparisonTitle" class="text-xs font-bold uppercase tracking-wide text-slate-800">Sector Peer Comparison (Max 5)</h3>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 text-slate-600 text-[10px] uppercase tracking-wider border-b border-slate-200">
+                <th class="py-1.5 px-2">Peer Stock</th>
+                <th class="py-1.5 px-2 text-right">Events</th>
+                <th class="py-1.5 px-2 text-right">Avg Pre %</th>
+                <th class="py-1.5 px-2 text-right">Avg T0 %</th>
+                <th class="py-1.5 px-2 text-right">Avg Post %</th>
+                <th class="py-1.5 px-2 text-right">Avg Total %</th>
+                <th class="py-1.5 px-2 text-right">Win Rate</th>
+              </tr>
+            </thead>
+            <tbody id="peerComparisonBody" class="divide-y divide-slate-100"></tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- IPO Fundamental & Valuation Analysis Tab (SME & Regular / Mainboard — GMP-Free) -->
+  <section id="tabIpo" class="hidden w-full p-1 sm:p-1.5 space-y-1.5">
+    <!-- Top Bar: NSE IPO Screener (Open / Upcoming / Listed — Mainboard & SME) -->
+    <div class="card-box rounded-md p-2 space-y-1.5">
+      <div class="flex flex-wrap items-center justify-between gap-1.5">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <span class="text-xs font-bold text-slate-900">Indian IPO List</span>
+          <div class="inline-flex bg-slate-100 p-0.5 rounded border border-slate-200 text-[11px]">
+            <button type="button" data-iposeg="ALL" class="ipo-seg-btn seg-btn active px-2 py-0.5 rounded font-medium">All</button>
+            <button type="button" data-iposeg="MAINBOARD" class="ipo-seg-btn seg-btn px-2 py-0.5 rounded font-medium text-slate-600">Regular</button>
+            <button type="button" data-iposeg="SME" class="ipo-seg-btn seg-btn px-2 py-0.5 rounded font-medium text-slate-600">SME</button>
+          </div>
+          <div class="inline-flex bg-slate-100 p-0.5 rounded border border-slate-200 text-[11px]">
+            <button type="button" data-ipoex="ALL" class="ipo-ex-btn seg-btn active px-2 py-0.5 rounded font-medium">All Exch</button>
+            <button type="button" data-ipoex="NSE" class="ipo-ex-btn seg-btn px-2 py-0.5 rounded font-medium text-slate-600">NSE</button>
+            <button type="button" data-ipoex="BSE" class="ipo-ex-btn seg-btn px-2 py-0.5 rounded font-medium text-slate-600">BSE</button>
+          </div>
+          <div class="inline-flex flex-wrap bg-slate-100 p-0.5 rounded border border-slate-200 text-[11px]">
+            <button type="button" data-ipost="ALL" class="ipo-st-btn seg-btn active px-2 py-0.5 rounded font-medium">All</button>
+            <button type="button" data-ipost="OPEN" class="ipo-st-btn seg-btn px-2 py-0.5 rounded font-medium text-slate-600">Open</button>
+            <button type="button" data-ipost="ALLOTMENT" class="ipo-st-btn seg-btn px-2 py-0.5 rounded font-medium text-slate-600">Allotment</button>
+            <button type="button" data-ipost="UPCOMING" class="ipo-st-btn seg-btn px-2 py-0.5 rounded font-medium text-slate-600">Upcoming</button>
+            <button type="button" data-ipost="LISTED" class="ipo-st-btn seg-btn px-2 py-0.5 rounded font-medium text-slate-600">Listed</button>
+          </div>
+        </div>
+        <div class="flex flex-wrap items-center gap-1.5">
+          <input
+            id="ipoFilterInput"
+            type="text"
+            placeholder="Filter IPO name..."
+            class="bg-white border border-slate-300 rounded px-2 py-1 text-xs text-slate-900 placeholder-slate-400 outline-none w-36 sm:w-52"
+          />
+        </div>
+      </div>
+
+      <!-- Compact Scrollable IPO List -->
+      <div class="overflow-x-auto max-h-56 overflow-y-auto border border-slate-200 rounded">
+        <table class="w-full text-left border-collapse text-xs">
+          <thead class="sticky top-0 bg-slate-50 border-b border-slate-200 text-[10px] uppercase text-slate-600">
+            <tr>
+              <th class="py-1 px-2">IPO Name</th>
+              <th class="py-1 px-1.5">Type</th>
+              <th class="py-1 px-1.5">Exch</th>
+              <th class="py-1 px-1.5">Status</th>
+              <th class="py-1 px-1.5">Open – Close</th>
+              <th class="py-1 px-1.5">Allot / Listing</th>
+              <th class="py-1 px-1.5 text-right">Price Band</th>
+              <th class="py-1 px-1.5 text-right">Size (Cr)</th>
+              <th class="py-1 px-2 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="ipoListBody" class="divide-y divide-slate-100">
+            <tr><td colspan="9" class="py-3 text-center text-slate-500">Loading Mainboard &amp; SME IPOs from NSE &amp; BSE...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- IPO Research Loading Animation -->
+    <div id="ipoLoadingState" class="hidden card-box rounded-md p-6 text-center space-y-2">
+      <div class="w-7 h-7 border-2 border-sky-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
+      <p id="ipoLoadingTitle" class="text-sm font-bold text-slate-900">Researching IPO fundamentals, subscription &amp; valuation...</p>
+      <p class="text-xs text-slate-600">Fetching live NSE issue data &amp; financial ratios. For educational research only — not SEBI-registered investment advice.</p>
+    </div>
+
+    <!-- Main Content (Hidden until user clicks Analyze or Predict on an IPO) -->
+    <div id="ipoWorkspace" class="hidden grid grid-cols-1 lg:grid-cols-12 gap-1.5 items-start">
+      <!-- Left: Editable IPO Data Form (Shown when user clicks Predict) -->
+      <div id="ipoManualPanel" class="hidden lg:col-span-4 card-box rounded-md p-2 space-y-2">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-1">
+          <h2 class="text-xs font-bold text-slate-900">Predict — Current + User Inputs</h2>
+          <div class="flex items-center gap-1">
+            <button type="button" id="ipoLoadSampleBtn" class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300">
+              Load Example
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-1.5 text-xs">
+          <div class="col-span-2">
+            <label class="block text-[10px] font-semibold text-slate-600">Company / IPO Name</label>
+            <input id="ipoCompany" type="text" value="Sample Tech India Ltd" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-600">IPO Type</label>
+            <select id="ipoSegment" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs outline-none">
+              <option value="MAINBOARD">Regular (Mainboard)</option>
+              <option value="SME">SME IPO</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-600">Upper Price (₹)</label>
+            <input id="ipoPriceMax" type="number" step="0.01" value="250" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-600">Lot Size (Shares)</label>
+            <input id="ipoLotSize" type="number" value="60" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-600">Issue Size (₹ Cr)</label>
+            <input id="ipoIssueSize" type="number" step="0.1" value="450" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-600">Fresh Issue (%)</label>
+            <input id="ipoFreshPct" type="number" min="0" max="100" value="75" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs outline-none" />
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-600">Post-IPO EPS (₹)</label>
+            <input id="ipoEps" type="number" step="0.01" value="11.5" class="w-full bg-white border border-slate-300 rounded px-2 py-1 text-xs outline-none" />
+          </div>
+        </div>
+
+        <!-- 3-Year Financials -->
+        <div class="pt-1 border-t border-slate-200 space-y-1">
+          <div class="text-[11px] font-bold text-slate-700">3-Year Financials (₹ Crore, from RHP)</div>
+          <div class="grid grid-cols-3 gap-1 text-xs">
+            <div>
+              <label class="block text-[10px] text-slate-500">FY-2 Rev</label>
+              <input id="ipoRev1" type="number" step="0.1" value="180" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">FY-1 Rev</label>
+              <input id="ipoRev2" type="number" step="0.1" value="240" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Latest Rev</label>
+              <input id="ipoRev3" type="number" step="0.1" value="325" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">FY-2 PAT</label>
+              <input id="ipoPat1" type="number" step="0.1" value="18" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">FY-1 PAT</label>
+              <input id="ipoPat2" type="number" step="0.1" value="27" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Latest PAT</label>
+              <input id="ipoPat3" type="number" step="0.1" value="42" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-1 text-xs">
+            <div>
+              <label class="block text-[10px] text-slate-500">Net Worth (Cr)</label>
+              <input id="ipoNetWorth" type="number" step="0.1" value="190" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Total Debt (Cr)</label>
+              <input id="ipoDebt" type="number" step="0.1" value="45" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Mkt Cap (Cr)</label>
+              <input id="ipoMcap" type="number" step="0.1" placeholder="Auto" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+          </div>
+        </div>
+
+        <!-- Official Subscription & Peer Valuation -->
+        <div class="pt-1 border-t border-slate-200 space-y-1">
+          <div class="text-[11px] font-bold text-slate-700">Official Subscription (x) &amp; Peers</div>
+          <div class="grid grid-cols-4 gap-1 text-xs">
+            <div>
+              <label class="block text-[10px] text-slate-500">QIB (x)</label>
+              <input id="ipoSubQib" type="number" step="0.1" value="24" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">NII (x)</label>
+              <input id="ipoSubNii" type="number" step="0.1" value="18" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Retail (x)</label>
+              <input id="ipoSubRetail" type="number" step="0.1" value="12" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Total (x)</label>
+              <input id="ipoSubTotal" type="number" step="0.1" value="17" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+          </div>
+          <div class="grid grid-cols-3 gap-1 text-xs">
+            <div class="col-span-2">
+              <label class="block text-[10px] text-slate-500">NSE Peer Symbols (optional)</label>
+              <input id="ipoPeers" type="text" placeholder="e.g. TCS, INFY, KPITTECH" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-500">Peer P/E</label>
+              <input id="ipoPeerPe" type="number" step="0.1" placeholder="Optional" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none" />
+            </div>
+          </div>
+        </div>
+
+        <button id="ipoAnalyzeBtn" class="w-full py-1.5 px-3 rounded bg-violet-600 hover:bg-violet-700 text-white font-semibold text-xs sm:text-sm transition">
+          Generate Prediction &amp; Report
+        </button>
+      </div>
+
+      <!-- Right: Two-Side Report (Titles inside each box, centered, with divider) -->
+      <div id="ipoReportContainer" class="lg:col-span-12 space-y-2">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-2 items-start">
+          <!-- SIDE 1: 1, 2, 3 -->
+          <div class="lg:col-span-6 space-y-2">
+            <!-- 1. Summary -->
+            <div id="ipoSummaryCard" class="card-box rounded-md p-2.5 space-y-2">
+              <div class="relative text-center border-b border-slate-200 pb-1.5">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-sky-700">1. Summary</h3>
+                <a id="ipoSebiLink" href="#" target="_blank" rel="noopener noreferrer" class="hidden sm:absolute sm:right-0 sm:top-0 inline-block mt-1 sm:mt-0 text-[11px] font-semibold text-emerald-700 hover:underline">
+                  📄 SEBI Filing
+                </a>
+              </div>
+              <div class="flex items-start justify-between gap-3 border-b border-slate-200 pb-1.5">
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-1.5">
+                    <h2 id="ipoRepTitle" class="text-sm sm:text-base font-bold text-slate-900">—</h2>
+                    <span id="ipoRepSegmentBadge" class="text-[10px] font-bold px-1.5 py-0.5 rounded border">—</span>
+                  </div>
+                  <p id="ipoRepPlainSummary" class="text-xs text-slate-700 mt-0.5 leading-snug">—</p>
+                </div>
+                <div class="text-right shrink-0">
+                  <div id="ipoOverallScore" class="text-2xl font-bold text-sky-700 leading-none">—</div>
+                  <div class="text-[11px] font-semibold text-slate-600">Score / 100</div>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                <div class="bg-slate-50 border border-slate-200 rounded p-2 border-l-4 border-l-emerald-600">
+                  <div class="text-[11px] font-bold text-slate-700">Listing Price (Fundamentals Only)</div>
+                  <div id="ipoFundPriceRange" class="text-base font-bold text-slate-900 mt-0.5">—</div>
+                  <div id="ipoFundGainLine" class="text-xs font-semibold mt-0.5">—</div>
+                  <div id="ipoFundLotLine" class="text-xs font-semibold">—</div>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded p-2 border-l-4 border-l-sky-600">
+                  <div class="text-[11px] font-bold text-slate-700">Listing Price (Fundamentals + Demand)</div>
+                  <div id="ipoListingPriceRange" class="text-base font-bold text-slate-900 mt-0.5">—</div>
+                  <div id="ipoListingGainLine" class="text-xs font-semibold mt-0.5">—</div>
+                  <div id="ipoListingLotLine" class="text-xs font-semibold">—</div>
+                  <p id="ipoListingPriceNote" class="text-[11px] text-slate-600 mt-0.5 leading-snug">—</p>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded p-2">
+                  <div class="text-[11px] font-bold text-slate-700">For Listing Gains</div>
+                  <div id="ipoListingVerdict" class="text-sm font-bold text-slate-900 mt-0.5">—</div>
+                  <p id="ipoListingNote" class="text-[11px] text-slate-600 mt-0.5 leading-snug">—</p>
+                </div>
+                <div class="bg-slate-50 border border-slate-200 rounded p-2">
+                  <div class="text-[11px] font-bold text-slate-700">For Long Term</div>
+                  <div id="ipoLongTermVerdict" class="text-sm font-bold text-slate-900 mt-0.5">—</div>
+                  <p id="ipoLongTermNote" class="text-[11px] text-slate-600 mt-0.5 leading-snug">—</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. Price & Issue Split -->
+            <div class="card-box rounded-md p-2.5 space-y-2">
+              <div class="relative text-center border-b border-slate-200 pb-1.5">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-purple-700">2. Price &amp; Issue Split</h3>
+                <span id="ipoValTagBadge" class="sm:absolute sm:right-0 sm:top-0 inline-block mt-1 sm:mt-0 text-[10px] font-bold px-1.5 py-0.5 rounded border">—</span>
+              </div>
+              <div id="ipoValuationGrid" class="grid grid-cols-2 gap-1.5"></div>
+            </div>
+
+            <!-- 3. Company Health -->
+            <div class="card-box rounded-md p-2.5 space-y-2">
+              <div class="text-center border-b border-slate-200 pb-1.5">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-emerald-700">3. Company Health</h3>
+              </div>
+              <div id="ipoFundamentalGrid" class="grid grid-cols-2 gap-1.5"></div>
+            </div>
+          </div>
+
+          <!-- SIDE 2: 4. Buyers Demand & Score, Company Details & Valuations, What's Good, Risks, Chart, Peers -->
+          <div class="lg:col-span-6 space-y-2">
+            <!-- 4. Buyers Demand & Score -->
+            <div class="card-box rounded-md p-2.5 space-y-2">
+              <div class="text-center border-b border-slate-200 pb-1.5">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-amber-700">4. Buyers Demand &amp; Score</h3>
+              </div>
+              <div id="ipoSubBars" class="grid grid-cols-4 gap-1.5"></div>
+              <div id="ipoScoreBars" class="space-y-1.5"></div>
+            </div>
+
+            <!-- Company Details & Valuations Table (Above What's Good) -->
+            <div class="card-box rounded-md p-2.5 space-y-2">
+              <div class="text-center border-b border-slate-200 pb-1.5">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-700">Company Details &amp; Valuations</h3>
+              </div>
+              <div id="ipoDetailsTableWrap" class="overflow-x-auto"></div>
+            </div>
+
+            <div class="card-box rounded-md p-2.5 space-y-2 border-l-4 border-l-emerald-600">
+              <div class="text-center border-b border-slate-200 pb-1.5">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-emerald-700">What's Good</h3>
+              </div>
+              <ul id="ipoStrengthsList" class="space-y-1.5 text-xs text-slate-700 list-disc pl-4 leading-relaxed"></ul>
+            </div>
+
+            <div class="card-box rounded-md p-2.5 space-y-2 border-l-4 border-l-rose-600">
+              <div class="text-center border-b border-slate-200 pb-1.5">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-rose-700">Risks to Watch</h3>
+              </div>
+              <ul id="ipoRisksList" class="space-y-1.5 text-xs text-slate-700 list-disc pl-4 leading-relaxed"></ul>
+            </div>
+
+            <div class="card-box rounded-md p-2.5 space-y-2">
+              <div class="text-center border-b border-slate-200 pb-1.5">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-700">Yearly Sales &amp; Profit / Loss (₹ Cr)</h3>
+              </div>
+              <div id="ipoFinChart" class="w-full h-[220px]"></div>
+            </div>
+
+            <div id="ipoPeersCard" class="card-box rounded-md p-2.5 space-y-2">
+              <div class="text-center border-b border-slate-200 pb-1.5">
+                <h3 class="text-xs font-bold uppercase tracking-wide text-slate-700">Similar Listed Companies</h3>
+              </div>
+              <div id="ipoPeersWrap" class="overflow-x-auto"></div>
+            </div>
+          </div>
+        </div>
+
+        <p id="ipoDisclaimer" class="text-[10px] text-slate-500 px-0.5"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Global Shree Yantra Sacred Loading Overlay -->
+  <div id="globalYantraOverlay" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 yantra-overlay-bg">
+    <div id="globalYantraStage" class="relative flex flex-col items-center justify-center w-full max-w-md"></div>
+  </div>
+
+  <script src="/static/yantra-loader.js"></script>
+  <script src="/static/app.js"></script>
+  <script src="/static/ipo.js"></script>
+</body>
+</html>
