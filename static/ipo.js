@@ -152,19 +152,19 @@
         return `
         <tr data-symbol="${item.symbol}" data-idx="${idx}" class="ipo-pick-row hover:bg-sky-50/70 transition">
           <td class="py-1.5 px-2 font-semibold text-slate-900">${item.company_name} <span class="text-[10px] font-mono text-slate-400">(${item.symbol})</span></td>
+          <td class="py-1 px-1.5 whitespace-nowrap">
+            <div class="inline-flex items-center gap-1">
+              <button type="button" data-idx="${idx}" class="ipo-btn-analyze px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-600 hover:bg-sky-700 text-white transition">Analyze</button>
+              <button type="button" data-idx="${idx}" class="ipo-btn-predict px-2 py-0.5 rounded text-[11px] font-semibold bg-violet-600 hover:bg-violet-700 text-white transition">Predict</button>
+            </div>
+          </td>
           <td class="py-1.5 px-1.5">${segBadge}</td>
           <td class="py-1.5 px-1.5">${exBadge}</td>
           <td class="py-1.5 px-1.5">${stBadge}</td>
           <td class="py-1.5 px-1.5 text-slate-600 whitespace-nowrap">${dateStr}</td>
           <td class="py-1.5 px-1.5 text-slate-600 whitespace-nowrap">${allotListStr}</td>
           <td class="py-1.5 px-1.5 text-right font-mono text-slate-800 whitespace-nowrap">${priceBand}</td>
-          <td class="py-1.5 px-1.5 text-right font-mono text-slate-700">${item.issue_size_cr ? item.issue_size_cr : "—"}</td>
-          <td class="py-1 px-2 text-right whitespace-nowrap">
-            <div class="inline-flex items-center gap-1">
-              <button type="button" data-idx="${idx}" class="ipo-btn-analyze px-2 py-0.5 rounded text-[11px] font-semibold bg-sky-600 hover:bg-sky-700 text-white transition">Analyze</button>
-              <button type="button" data-idx="${idx}" class="ipo-btn-predict px-2 py-0.5 rounded text-[11px] font-semibold bg-violet-600 hover:bg-violet-700 text-white transition">Predict</button>
-            </div>
-          </td>
+          <td class="py-1.5 px-2 text-right font-mono text-slate-700">${item.issue_size_cr ? item.issue_size_cr : "—"}</td>
         </tr>`;
       })
       .join("");
